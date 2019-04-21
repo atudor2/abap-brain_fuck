@@ -23,7 +23,7 @@ CLASS zcl_brainfuck_compiler DEFINITION
     METHODS add_or_fold_instruction
       IMPORTING
         i_token         TYPE zif_brainfuck_instruction=>t_instruction_type
-        i_location type i
+        i_location      TYPE i
       CHANGING
         ct_instructions TYPE zif_brainfuck_instruction=>tt_instructions
       RETURNING
@@ -34,6 +34,7 @@ CLASS zcl_brainfuck_compiler DEFINITION
 ENDCLASS.
 
 CLASS zcl_brainfuck_compiler IMPLEMENTATION.
+
   METHOD zif_brainfuck_compiler~compile.
     DATA:
       loop_stack TYPE STANDARD TABLE OF i,
@@ -48,8 +49,8 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
       RAISE EXCEPTION TYPE zcx_brainfuck_error.
     ENDIF.
 
-    DO code_len - 1 TIMES.
-      DATA(i) = sy-index.
+    DO code_len TIMES.
+      DATA(i) = sy-index - 1.
       DATA(char) = i_code+i(1).
 
       DATA(token) = char_to_instruction( char ).
@@ -83,10 +84,10 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
     ENDDO.
 
     " If loop stack is not empty, then a loop was not closed...
-    IF loop_stack[] is not INITIAL.
-        " Syntax error
-        ASSERT 1 = 2.
-    endif.
+    IF loop_stack[] IS NOT INITIAL.
+      " Syntax error
+      ASSERT 1 = 2.
+    ENDIF.
   ENDMETHOD.
 
   METHOD char_to_instruction.
@@ -112,6 +113,7 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
         r_token = zif_brainfuck_instruction=>instruction_type-comment.
     ENDCASE.
   ENDMETHOD.
+
 
   METHOD add_or_fold_instruction.
     DATA last_instruction TYPE REF TO zif_brainfuck_instruction.
