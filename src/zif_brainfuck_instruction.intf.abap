@@ -2,10 +2,10 @@
 INTERFACE zif_brainfuck_instruction
   PUBLIC .
 
-  TYPES t_instruction_char TYPE c LENGTH 1.
+  TYPES t_instruction_type_char TYPE c LENGTH 1.
 
   TYPES:
-    BEGIN OF ENUM t_instruction STRUCTURE instructions BASE TYPE t_instruction_char,
+    BEGIN OF ENUM t_instruction_type STRUCTURE instruction_type BASE TYPE t_instruction_type_char,
       unknown         VALUE IS INITIAL,
       plus            VALUE '+',
       minus           VALUE '-',
@@ -16,15 +16,23 @@ INTERFACE zif_brainfuck_instruction
       jmp_if_zero     VALUE '[',
       jmp_if_not_zero VALUE ']',
       comment         VALUE '#',
-    END OF ENUM t_instruction STRUCTURE instructions.
+    END OF ENUM t_instruction_type STRUCTURE instruction_type.
 
-  TYPES tt_instructions TYPE STANDARD TABLE OF zif_brainfuck_instruction=>t_instruction WITH EMPTY KEY.
+  TYPES tt_instructions TYPE STANDARD TABLE OF REF TO zif_brainfuck_instruction WITH EMPTY KEY.
 
-  CLASS-METHODS get_as_instruction
-    IMPORTING i_instruction   TYPE t_instruction_char
-    RETURNING VALUE(r_result) TYPE zif_brainfuck_instruction=>t_instruction.
+  DATA:
+    type                 TYPE t_instruction_type READ-ONLY,
+    source_code_location TYPE i,
+    repeated             TYPE i,
+    argument             TYPE i.
 
-  CLASS-METHODS get_instruction_as_string
-    IMPORTING i_instruction   TYPE zif_brainfuck_instruction=>t_instruction
-    RETURNING VALUE(r_result) TYPE t_instruction_char.
+  CLASS-METHODS create
+    IMPORTING
+      i_instruction   TYPE t_instruction_type
+      i_location      TYPE i DEFAULT 0
+      i_repeated      TYPE i DEFAULT 1
+    RETURNING
+      VALUE(r_result) TYPE REF TO zif_brainfuck_instruction
+    RAISING
+      zcx_brainfuck_error.
 ENDINTERFACE.

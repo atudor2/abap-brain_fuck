@@ -1,6 +1,6 @@
 "! <p class="shorttext synchronized" lang="en">Brainfuck Executor</p>
-interface ZIF_BRAINFUCK_EXECUTOR
-  public .
+INTERFACE zif_brainfuck_executor
+  PUBLIC .
 
   TYPES tt_instructions TYPE zif_brainfuck_instruction=>tt_instructions.
 
@@ -14,4 +14,4 @@ interface ZIF_BRAINFUCK_EXECUTOR
       i_memory_cells  TYPE i DEFAULT c_default_memory_cells
     RAISING
       zcx_brainfuck_error.
-endinterface.
+ENDINTERFACE.
