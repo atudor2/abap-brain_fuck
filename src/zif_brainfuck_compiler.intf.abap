@@ -6,9 +6,10 @@ INTERFACE zif_brainfuck_compiler
 
   METHODS compile
     IMPORTING
-      i_code          TYPE string
+      i_code           TYPE string
+      i_allow_debugger TYPE abap_bool DEFAULT abap_true
     EXPORTING
-      et_instructions TYPE tt_instructions
+      et_instructions  TYPE tt_instructions
     RAISING
       zcx_brainfuck_error.
 ENDINTERFACE.

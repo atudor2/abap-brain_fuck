@@ -15,7 +15,8 @@ INTERFACE zif_brainfuck_instruction
       read_char       VALUE ',',
       jmp_if_zero     VALUE '[',
       jmp_if_not_zero VALUE ']',
-      comment         VALUE '#',
+      comment         VALUE '0',
+      debugger        VALUE '#',
     END OF ENUM t_instruction_type STRUCTURE instruction_type.
 
   TYPES tt_instructions TYPE STANDARD TABLE OF REF TO zif_brainfuck_instruction WITH EMPTY KEY.
