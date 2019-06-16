@@ -45,15 +45,25 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
     DATA(code_len) = strlen( i_code ).
 
     IF code_len < 1.
-      " todo better error...
-      RAISE EXCEPTION TYPE zcx_brainfuck_error.
+      RAISE EXCEPTION TYPE zcx_brainfuck_syntax_error
+        EXPORTING
+          location    = 0
+          source_code = i_code
+          message     = 'Empty source code'.
     ENDIF.
 
+    DATA(i) = 0.
     DO code_len TIMES.
-      DATA(i) = sy-index - 1.
+      i = sy-index - 1.
+
       DATA(char) = i_code+i(1).
 
       DATA(token) = char_to_instruction( char ).
+
+      " Allow debugger calls?
+      IF token = zif_brainfuck_instruction=>instruction_type-debugger AND i_allow_debugger <> abap_true.
+        CONTINUE.
+      ENDIF.
 
       " If same as last token, then bump the REPEAT value...
       DATA(insertion) = add_or_fold_instruction( EXPORTING i_token = token
@@ -78,15 +88,22 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
               et_instructions[ open_loop ]->argument = insertion-insert_index.
             CATCH cx_sy_itab_line_not_found.
               " Syntax error -> closing loop without corresponding opening
-              ASSERT 1 = 0. " todo
+              RAISE EXCEPTION TYPE zcx_brainfuck_syntax_error
+                EXPORTING
+                  location    = i
+                  source_code = i_code
+                  message     = |No opening '[' for loop|.
           ENDTRY.
       ENDCASE.
     ENDDO.
 
     " If loop stack is not empty, then a loop was not closed...
     IF loop_stack[] IS NOT INITIAL.
-      " Syntax error
-      ASSERT 1 = 2.
+      RAISE EXCEPTION TYPE zcx_brainfuck_syntax_error
+        EXPORTING
+          location    = i
+          source_code = i_code
+          message     = |No closing ']' for loop|.
     ENDIF.
   ENDMETHOD.
 
@@ -108,6 +125,8 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
         r_token = zif_brainfuck_instruction=>instruction_type-put_char.
       WHEN ','.
         r_token = zif_brainfuck_instruction=>instruction_type-read_char.
+      WHEN '#'.
+        r_token = zif_brainfuck_instruction=>instruction_type-debugger.
       WHEN OTHERS.
         " Anything else is a comment
         r_token = zif_brainfuck_instruction=>instruction_type-comment.
