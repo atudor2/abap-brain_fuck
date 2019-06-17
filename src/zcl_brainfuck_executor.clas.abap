@@ -13,18 +13,18 @@ CLASS zcl_brainfuck_executor DEFINITION
         data_pointer        TYPE i,
         memory_cells        TYPE i,
         instruction         TYPE REF TO zif_brainfuck_instruction,
-        memory              TYPE STANDARD TABLE OF i WITH EMPTY KEY,
+        memory              TYPE zif_brainfuck_instruction=>tt_memory_cells,
       END OF t_exec_state.
 
     METHODS write_char
       IMPORTING
-        i_value   TYPE i
+        i_value   TYPE zif_brainfuck_instruction=>t_memory_cell
         ir_output TYPE REF TO zif_brainfuck_output_stream.
     METHODS read_char
       IMPORTING
         ir_input        TYPE REF TO zif_brainfuck_input_stream
       RETURNING
-        VALUE(r_result) TYPE i.
+        VALUE(r_result) TYPE zif_brainfuck_instruction=>t_memory_cell.
 
     METHODS init_memory_cells
       IMPORTING
@@ -36,19 +36,17 @@ CLASS zcl_brainfuck_executor DEFINITION
         ir_output    TYPE REF TO zif_brainfuck_output_stream.
 ENDCLASS.
 
-CLASS zcl_brainfuck_executor IMPLEMENTATION.
+
+
+CLASS ZCL_BRAINFUCK_EXECUTOR IMPLEMENTATION.
+
+
   METHOD dump_execution_state.
     ir_output->flush( ).
 
-    " Message and then output the Brainfuck way - char by char...
     DATA(dbg_msg) = |IP = { i_exec_state-instruction_pointer }, DP = { i_exec_state-data_pointer }, Instruction = { CONV string( i_exec_state-instruction->type ) }|.
 
-    DO strlen( dbg_msg ) TIMES.
-      DATA(i) = sy-index - 1.
-      DATA(char) = dbg_msg+i(1).
-      ir_output->write_character( CONV #( char ) ).
-    ENDDO.
-
+    ir_output->write_string( i_string = dbg_msg ).
     ir_output->flush( ).
   ENDMETHOD.
 
@@ -66,7 +64,7 @@ CLASS zcl_brainfuck_executor IMPLEMENTATION.
 
 
   METHOD write_char.
-    DATA(char) = CONV zif_brainfuck_output_stream=>t_character( cl_abap_conv_in_ce=>uccpi( i_value ) ).
+    DATA(char) = CONV zif_brainfuck_output_stream=>t_character( cl_abap_conv_in_ce=>uccpi( CONV #( i_value ) ) ).
     ir_output->write_character( char ).
   ENDMETHOD.
 

@@ -3,6 +3,8 @@ INTERFACE zif_brainfuck_instruction
   PUBLIC .
 
   TYPES t_instruction_type_char TYPE c LENGTH 1.
+  TYPES t_memory_cell TYPE int1.
+  TYPES tt_memory_cells TYPE STANDARD TABLE OF t_memory_cell WITH EMPTY KEY.
 
   TYPES:
     BEGIN OF ENUM t_instruction_type STRUCTURE instruction_type BASE TYPE t_instruction_type_char,
