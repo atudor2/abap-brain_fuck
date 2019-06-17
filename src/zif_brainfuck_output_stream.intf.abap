@@ -7,5 +7,8 @@ INTERFACE zif_brainfuck_output_stream
   METHODS write_character
     IMPORTING i_character TYPE t_character.
 
+  METHODS write_string
+    IMPORTING i_string TYPE string.
+
   METHODS flush.
 ENDINTERFACE.
