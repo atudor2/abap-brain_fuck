@@ -1,2 +1,4 @@
 # abap-brain_fuck
-Brainf*ck VM in ABAP
+Brainf*ck in ABAP
+
+Just for play, probably doesn't work
