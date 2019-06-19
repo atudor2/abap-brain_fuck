@@ -25,7 +25,7 @@ CLASS zcl_brainfuck_main IMPLEMENTATION.
           IMPORTING
             et_instructions     = DATA(instructions) ).
 
-        DATA(exe) = NEW zcl_brainfuck_executor( ).
+        DATA(exe) = NEW zcl_brainfuck_interpreter( ).
 
         exe->zif_brainfuck_executor~execute(
           EXPORTING
