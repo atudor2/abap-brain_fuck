@@ -3,6 +3,8 @@
 *"* declarations
 CLASS lcl_execution_state IMPLEMENTATION.
   METHOD constructor.
+    super->constructor( ).
+
     ASSERT i_memory_cells > 0.
 
     " Init state
@@ -15,9 +17,12 @@ CLASS lcl_execution_state IMPLEMENTATION.
 
     me->set_instruction_pointer( 1 ).
 
-    DO me->total_memory_cells TIMES.
-      INSERT INITIAL LINE INTO TABLE me->memory_cells.
-    ENDDO.
+    me->initialise_memory_cells(
+      EXPORTING
+        i_max_cells     = me->total_memory_cells
+      CHANGING
+        ct_memory_cells = me->memory_cells
+    ).
   ENDMETHOD.
 
   METHOD has_instructions.
@@ -33,14 +38,11 @@ CLASS lcl_execution_state IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD shift_data_pointer.
-    me->data_pointer = me->data_pointer + i_shift.
-
-    " Wrap around?
-    IF me->data_pointer < 1.
-      me->data_pointer = me->total_memory_cells. " Under run of DP -> wrap around
-    ELSEIF me->data_pointer > me->total_memory_cells.
-      me->data_pointer = 1. " Overrun of DP -> wrap back to 1
-    ENDIF.
+    me->data_pointer = me->move_data_pointer(
+                       i_dp        = me->data_pointer
+                       i_shift     = i_shift
+                       i_max_cells = me->total_memory_cells
+                   ).
   ENDMETHOD.
 
   METHOD get_value.
@@ -52,33 +54,19 @@ CLASS lcl_execution_state IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD decrement_value.
-    DATA(value) = me->safe_value_wrap(
-                        i_value    = me->get_value( )
-                        i_adjument = - i_shift ).
+    DATA(value) = me->adj_cell_value_with_wrap(
+                        i_value      = me->get_value( )
+                        i_adjustment = - i_shift ).
 
     me->set_value( value ).
   ENDMETHOD.
 
   METHOD increment_value.
-    DATA(value) = me->safe_value_wrap(
-                        i_value    = me->get_value( )
-                        i_adjument = i_shift ).
+    DATA(value) = me->adj_cell_value_with_wrap(
+                        i_value      = me->get_value( )
+                        i_adjustment = i_shift ).
 
     me->set_value( value ).
-  ENDMETHOD.
-
-  METHOD safe_value_wrap.
-    " Must do integer wrap around - by default ABAP will raise exception on overflow, so handle the situation manually
-    DATA int_result TYPE i.
-
-    int_result = i_value + i_adjument.
-    IF int_result < 0.
-      r_result = abs( int_result + 255 ).
-    ELSEIF int_result > 255.
-      r_result = abs( 255 - int_result ).
-    ELSE.
-      r_result = int_result.
-    ENDIF.
   ENDMETHOD.
 
   METHOD set_instruction_pointer.
