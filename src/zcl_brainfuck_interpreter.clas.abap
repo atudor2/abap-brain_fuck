@@ -1,4 +1,5 @@
-CLASS zcl_brainfuck_executor DEFINITION
+"! <p class="shorttext synchronized" lang="en">Brainfuck Executor</p>
+CLASS zcl_brainfuck_interpreter DEFINITION
   PUBLIC
   FINAL
   CREATE PUBLIC .
@@ -33,7 +34,7 @@ CLASS zcl_brainfuck_executor DEFINITION
         ir_output    TYPE REF TO zif_brainfuck_output_stream.
 ENDCLASS.
 
-CLASS zcl_brainfuck_executor IMPLEMENTATION.
+CLASS zcl_brainfuck_interpreter IMPLEMENTATION.
 
   METHOD dump_execution_state.
     ir_output->flush( ).

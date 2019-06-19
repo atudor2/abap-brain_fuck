@@ -3,7 +3,7 @@
  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
   <asx:values>
    <VSEOCLASS>
-    <CLSNAME>ZCL_BRAINFUCK_EXECUTOR</CLSNAME>
+    <CLSNAME>ZCL_BRAINFUCK_INTERPRETER</CLSNAME>
     <LANGU>E</LANGU>
     <DESCRIPT>Brainfuck Executor</DESCRIPT>
     <STATE>1</STATE>
@@ -13,13 +13,13 @@
    </VSEOCLASS>
    <DESCRIPTIONS>
     <SEOCOMPOTX>
-     <CLSNAME>ZCL_BRAINFUCK_EXECUTOR</CLSNAME>
+     <CLSNAME>ZCL_BRAINFUCK_INTERPRETER</CLSNAME>
      <CMPNAME>READ_CHAR</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Reads a input value (from user, file etc) into a memory cell</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
-     <CLSNAME>ZCL_BRAINFUCK_EXECUTOR</CLSNAME>
+     <CLSNAME>ZCL_BRAINFUCK_INTERPRETER</CLSNAME>
      <CMPNAME>WRITE_CHAR</CMPNAME>
      <LANGU>E</LANGU>
      <DESCRIPT>Writes a memory cell to the output stream</DESCRIPT>
