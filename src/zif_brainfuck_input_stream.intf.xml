@@ -4,13 +4,20 @@
   <asx:values>
    <VSEOINTERF>
     <CLSNAME>ZIF_BRAINFUCK_INPUT_STREAM</CLSNAME>
-    <VERSION>1</VERSION>
     <LANGU>E</LANGU>
     <DESCRIPT>Brainfuck Input Stream</DESCRIPT>
     <EXPOSURE>2</EXPOSURE>
     <STATE>1</STATE>
     <UNICODE>X</UNICODE>
    </VSEOINTERF>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>ZIF_BRAINFUCK_INPUT_STREAM</CLSNAME>
+     <CMPNAME>READ_CHARACTER</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Reads a character from the Input Stream</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
   </asx:values>
  </asx:abap>
 </abapGit>
