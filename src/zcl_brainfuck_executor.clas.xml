@@ -4,7 +4,6 @@
   <asx:values>
    <VSEOCLASS>
     <CLSNAME>ZCL_BRAINFUCK_EXECUTOR</CLSNAME>
-    <VERSION>1</VERSION>
     <LANGU>E</LANGU>
     <DESCRIPT>Brainfuck Executor</DESCRIPT>
     <STATE>1</STATE>
@@ -12,6 +11,20 @@
     <FIXPT>X</FIXPT>
     <UNICODE>X</UNICODE>
    </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BRAINFUCK_EXECUTOR</CLSNAME>
+     <CMPNAME>READ_CHAR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Reads a input value (from user, file etc) into a memory cell</DESCRIPT>
+    </SEOCOMPOTX>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BRAINFUCK_EXECUTOR</CLSNAME>
+     <CMPNAME>WRITE_CHAR</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Writes a memory cell to the output stream</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
   </asx:values>
  </asx:abap>
 </abapGit>
