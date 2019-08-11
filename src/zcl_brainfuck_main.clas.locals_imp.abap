@@ -3,7 +3,6 @@
 *"* declarations
 
 CLASS lcl_out DEFINITION CREATE PUBLIC.
-
   PUBLIC SECTION.
     INTERFACES zif_brainfuck_output_stream.
     DATA out TYPE REF TO if_oo_adt_intrnl_classrun .
@@ -25,5 +24,26 @@ CLASS lcl_out IMPLEMENTATION.
 
   METHOD zif_brainfuck_output_stream~write_string.
     me->string = me->string && i_string.
+  ENDMETHOD.
+ENDCLASS.
+
+CLASS lcl_null_out DEFINITION CREATE PUBLIC.
+  PUBLIC SECTION.
+    INTERFACES zif_brainfuck_output_stream.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+ENDCLASS.
+
+CLASS lcl_null_out IMPLEMENTATION.
+  METHOD zif_brainfuck_output_stream~flush.
+    RETURN.
+  ENDMETHOD.
+
+  METHOD zif_brainfuck_output_stream~write_character.
+    RETURN.
+  ENDMETHOD.
+
+  METHOD zif_brainfuck_output_stream~write_string.
+    RETURN.
   ENDMETHOD.
 ENDCLASS.

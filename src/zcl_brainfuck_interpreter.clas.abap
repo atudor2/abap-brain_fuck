@@ -30,8 +30,8 @@ CLASS zcl_brainfuck_interpreter DEFINITION
     "! @parameter ir_output | <p class="shorttext synchronized" lang="en"></p>
     METHODS dump_execution_state
       IMPORTING
-        ir_exec_state TYPE ref to lcl_execution_state
-        ir_output    TYPE REF TO zif_brainfuck_output_stream.
+        ir_exec_state TYPE REF TO lcl_execution_state
+        ir_output     TYPE REF TO zif_brainfuck_output_stream.
 ENDCLASS.
 
 CLASS zcl_brainfuck_interpreter IMPLEMENTATION.
@@ -107,6 +107,8 @@ CLASS zcl_brainfuck_interpreter IMPLEMENTATION.
                                     ir_output     = ir_output ).
         WHEN zif_brainfuck_instruction=>instruction_type-comment.
           " NOP
+        WHEN OTHERS.
+          RAISE EXCEPTION TYPE zcx_brainfuck_error.
       ENDCASE.
 
       exec_state->next_instruction( ).

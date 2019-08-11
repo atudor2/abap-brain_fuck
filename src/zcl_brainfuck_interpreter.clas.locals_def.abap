@@ -3,7 +3,10 @@
 *"* components in the private section
 
 "! Execution state for Brainfuck engine
-CLASS lcl_execution_state DEFINITION CREATE PUBLIC.
+CLASS lcl_execution_state DEFINITION
+  INHERITING FROM zcl_brainfuck_executor_base
+  CREATE PUBLIC.
+
   PUBLIC SECTION.
     "! @parameter it_instructions | Instructions for program
     "! @parameter i_memory_cells | Max number of memory cells
@@ -74,13 +77,6 @@ CLASS lcl_execution_state DEFINITION CREATE PUBLIC.
     DATA:
       "! Total number of instructions
       total_instructions TYPE i.
-
-    METHODS safe_value_wrap
-      IMPORTING
-        i_value         TYPE zif_brainfuck_instruction=>t_memory_cell
-        i_adjument      TYPE i
-      RETURNING
-        VALUE(r_result) TYPE zif_brainfuck_instruction=>t_memory_cell.
 
     "! Sets the instruction pointer
     "! @parameter i_ip | Instruction count
