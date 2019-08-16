@@ -1,10 +1,12 @@
-"! <p class="shorttext synchronized" lang="en">Brainfuck Executor - Code Generator</p>
+"! <p class="shorttext synchronized" lang="en">Brainfuck Executor - Code Generation</p>
 CLASS zcl_brainfuck_code_gen DEFINITION
   PUBLIC
   FINAL
-  CREATE PRIVATE .
+  CREATE PUBLIC.
 
   PUBLIC SECTION.
+    INTERFACES zif_brainfuck_executor.
+
     TYPES t_prog_src TYPE c LENGTH 255.
     TYPES tt_prog_src TYPE STANDARD TABLE OF t_prog_src WITH EMPTY KEY.
 
@@ -34,6 +36,9 @@ CLASS zcl_brainfuck_code_gen IMPLEMENTATION.
   METHOD get_dyn_program_header.
     r_result = VALUE #(
         ( 'program.                                                      ' )
+        ( '*""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""*' )
+        ( '* Brainf*ck code generation                                  *' )
+        ( '*""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""*' )
         ( 'class main definition                                         ' )
         ( '  inheriting from zcl_brainfuck_executor_base                 ' )
         ( '  create public.                                              ' )
@@ -133,5 +138,20 @@ CLASS zcl_brainfuck_code_gen IMPLEMENTATION.
 
     et_source_code[] = prog_src[].
     CREATE OBJECT r_result TYPE (dyn_class).
+  ENDMETHOD.
+
+  METHOD zif_brainfuck_executor~execute.
+    " Generate and immediately call the dyn object
+    DATA(dyn_exec) = generate_program(
+                   EXPORTING
+                     it_instructions     = it_instructions
+                     i_memory_cells      = i_memory_cells ).
+
+    dyn_exec->execute(
+      EXPORTING
+        it_instructions     = it_instructions
+        ir_input            = ir_input
+        ir_output           = ir_output
+        i_memory_cells      = i_memory_cells ).
   ENDMETHOD.
 ENDCLASS.

@@ -52,11 +52,12 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
           message     = 'Empty source code'.
     ENDIF.
 
-    DATA(i) = 0.
+    DATA(location) = 0.
     DO code_len TIMES.
-      i = sy-index - 1.
+      DATA(offset) = sy-index - 1. " 0-index
+      location     = offset + 1.   " 1-index
 
-      DATA(char) = i_code+i(1).
+      DATA(char) = i_code+offset(1).
 
       DATA(token) = char_to_instruction( char ).
 
@@ -67,7 +68,7 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
 
       " If same as last token, then bump the REPEAT value...
       DATA(insertion) = add_or_fold_instruction( EXPORTING i_token = token
-                                                           i_location = i
+                                                           i_location = location
                                                  CHANGING  ct_instructions = et_instructions ).
 
       " Handle loops to set the open/close index
@@ -90,7 +91,7 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
               " Syntax error -> closing loop without corresponding opening
               RAISE EXCEPTION TYPE zcx_brainfuck_syntax_error
                 EXPORTING
-                  location    = i
+                  location    = location
                   source_code = i_code
                   message     = |No opening '[' for loop|.
           ENDTRY.
@@ -101,7 +102,7 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
     IF loop_stack[] IS NOT INITIAL.
       RAISE EXCEPTION TYPE zcx_brainfuck_syntax_error
         EXPORTING
-          location    = i
+          location    = location
           source_code = i_code
           message     = |No closing ']' for loop|.
     ENDIF.

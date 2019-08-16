@@ -5,7 +5,7 @@
    <VSEOCLASS>
     <CLSNAME>ZCL_BRAINFUCK_CODE_GEN</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Brainfuck Executor - Code Generator</DESCRIPT>
+    <DESCRIPT>Brainfuck Executor - Code Generation</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

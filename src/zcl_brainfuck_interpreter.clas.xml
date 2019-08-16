@@ -5,7 +5,7 @@
    <VSEOCLASS>
     <CLSNAME>ZCL_BRAINFUCK_INTERPRETER</CLSNAME>
     <LANGU>E</LANGU>
-    <DESCRIPT>Brainfuck Executor</DESCRIPT>
+    <DESCRIPT>Brainfuck Executor - Interpreter</DESCRIPT>
     <STATE>1</STATE>
     <CLSCCINCL>X</CLSCCINCL>
     <FIXPT>X</FIXPT>

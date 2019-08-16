@@ -1,4 +1,4 @@
-"! <p class="shorttext synchronized" lang="en">Brainfuck Executor</p>
+"! <p class="shorttext synchronized" lang="en">Brainfuck Executor - Interpreter</p>
 CLASS zcl_brainfuck_interpreter DEFINITION
   PUBLIC
   FINAL
