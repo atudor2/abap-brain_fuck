@@ -20,6 +20,7 @@ INTERFACE zif_brainfuck_executor
       ir_input        TYPE REF TO zif_brainfuck_input_stream
       ir_output       TYPE REF TO zif_brainfuck_output_stream
       i_memory_cells  TYPE i DEFAULT c_default_memory_cells
+      ir_inspector    TYPE REF TO zif_brainfuck_inspector OPTIONAL
     RAISING
       zcx_brainfuck_error.
 ENDINTERFACE.

@@ -24,6 +24,7 @@ CLASS zcl_brainfuck_compiler DEFINITION
       IMPORTING
         i_token         TYPE zif_brainfuck_instruction=>t_instruction_type
         i_location      TYPE i
+        i_optimised type abap_bool
       CHANGING
         ct_instructions TYPE zif_brainfuck_instruction=>tt_instructions
       RETURNING
@@ -67,8 +68,9 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
       ENDIF.
 
       " If same as last token, then bump the REPEAT value...
-      DATA(insertion) = add_or_fold_instruction( EXPORTING i_token = token
-                                                           i_location = location
+      DATA(insertion) = add_or_fold_instruction( EXPORTING i_token     = token
+                                                           i_location  = location
+                                                           i_optimised = xsdbool( i_optimisation_level <> zif_brainfuck_compiler=>optimisation_levels-none )
                                                  CHANGING  ct_instructions = et_instructions ).
 
       " Handle loops to set the open/close index
@@ -138,13 +140,13 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
   METHOD add_or_fold_instruction.
     DATA last_instruction TYPE REF TO zif_brainfuck_instruction.
 
-    " If the last instruction is the same, just bump the REPEAT...
+    " If the last instruction is the same, just bump the REPEAT if optmisations are on
     DATA(count) = lines( ct_instructions ).
     IF count > 0.
       last_instruction = ct_instructions[ count ].
     ENDIF.
 
-    IF last_instruction IS BOUND AND last_instruction->type = i_token.
+    IF i_optimised = abap_true AND last_instruction IS BOUND AND last_instruction->type = i_token.
       " Nothing to add, just bump the REPEAT
       last_instruction->repeated = last_instruction->repeated + 1.
 
@@ -154,7 +156,7 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
     ENDIF.
 
     " New instruction:
-    " ...todo decouple...
+    " @TODO decouple...
     DATA(instruction) = zcl_brainfuck_instruction=>zif_brainfuck_instruction~create(
                                             i_instruction = i_token
                                             i_location    = i_location

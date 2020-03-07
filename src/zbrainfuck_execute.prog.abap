@@ -45,7 +45,7 @@ CLASS lcl_application DEFINITION
     DATA instruction_dump_method TYPE lcl_application=>instruction_dump_meth.
     DATA code TYPE string.
     CLASS-DATA text_editor TYPE REF TO cl_gui_textedit.
-    CLASS-DATA c_dock_ratio TYPE i VALUE 75.
+    CLASS-DATA c_dock_ratio TYPE i VALUE 68.
 
     CLASS-METHODS init_class_dropdown
       IMPORTING
@@ -94,7 +94,8 @@ PARAMETERS p_instr1 TYPE abap_bool RADIOBUTTON GROUP inst DEFAULT 'X'. " Do not 
 PARAMETERS p_instr2 TYPE abap_bool RADIOBUTTON GROUP inst.             " Dump instructions
 PARAMETERS p_instr3 TYPE abap_bool RADIOBUTTON GROUP inst.             " Dump instructions (with comments)
 
-PARAMETERS p_debug TYPE abap_bool AS CHECKBOX. " Enable debug instruction?
+PARAMETERS p_debug TYPE abap_bool AS CHECKBOX.             " Enable debug instruction?
+PARAMETERS p_optim TYPE abap_bool AS CHECKBOX DEFAULT 'X'. " Enable Optimisations?
 
 *""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 *" Selection Screen Events
@@ -148,7 +149,7 @@ CLASS lcl_application IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD print.
-    SPLIT i_value AT cl_abap_char_utilities=>cr_lf INTO TABLE DATA(lines).
+    SPLIT i_value AT cl_abap_char_utilities=>newline INTO TABLE DATA(lines).
 
     LOOP AT lines ASSIGNING FIELD-SYMBOL(<line>).
       WRITE: / <line>.
@@ -166,8 +167,10 @@ CLASS lcl_application IMPLEMENTATION.
 
         compiler->compile(
           EXPORTING
-            i_code              = code
-            i_allow_debugger    = me->enable_debug_instructions
+            i_code               = code
+            i_allow_debugger     = me->enable_debug_instructions
+            i_optimisation_level = COND #( WHEN p_optim = abap_true THEN zif_brainfuck_compiler=>optimisation_levels-full
+                                                                    ELSE zif_brainfuck_compiler=>optimisation_levels-none )
           IMPORTING
             et_instructions     = DATA(instructions) ).
 
@@ -196,6 +199,9 @@ CLASS lcl_application IMPLEMENTATION.
   METHOD dump_instructions.
     CHECK me->instruction_dump_method <> no_dump.
 
+    DATA(total_instrs) = conv f( lines( it_instructions ) ).
+    DATA(padding) = CONV i( log10( total_instrs ) ) + 1.
+
     DATA(i) = 0.
     LOOP AT it_instructions ASSIGNING FIELD-SYMBOL(<ins>).
       " Skip comments and debug commands if basic dump
@@ -206,7 +212,7 @@ CLASS lcl_application IMPLEMENTATION.
       ENDIF.
 
       i = i + 1.
-      print( |[{ i }] Source: { <ins>->source_code_location } -> { <ins>->type }(x{ <ins>->repeated })[Argument = { <ins>->argument }]| ).
+      print( |[{ i PAD = '0' ALIGN = RIGHT WIDTH = padding }] Source: { <ins>->source_code_location } -> { <ins>->type }(x{ <ins>->repeated })[Argument = { <ins>->argument }]| ).
     ENDLOOP.
   ENDMETHOD.
 

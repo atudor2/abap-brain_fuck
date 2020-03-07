@@ -52,6 +52,12 @@
      <ENTRY>Dump all instructions</ENTRY>
      <LENGTH>29</LENGTH>
     </item>
+    <item>
+     <ID>S</ID>
+     <KEY>P_OPTIM</KEY>
+     <ENTRY>Enable Optimisations?</ENTRY>
+     <LENGTH>29</LENGTH>
+    </item>
    </TPOOL>
   </asx:values>
  </asx:abap>

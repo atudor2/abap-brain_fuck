@@ -5,6 +5,12 @@ INTERFACE zif_brainfuck_compiler
   "! Type alias for set of Brainfuck Instructions
   TYPES tt_instructions TYPE zif_brainfuck_instruction=>tt_instructions.
 
+  TYPES:
+    BEGIN OF ENUM enum_optimisation STRUCTURE optimisation_levels,
+      none,
+      full,
+    END OF ENUM enum_optimisation STRUCTURE optimisation_levels.
+
   "! <p class="shorttext synchronized" lang="en">Compile Brainfuck source code into a set of instructions</p>
   "! @parameter i_code | <p class="shorttext synchronized" lang="en">Brainfuck source code</p>
   "! @parameter i_allow_debugger | <p class="shorttext synchronized" lang="en">Allow debugger instructions (ABAP_TRUE)?</p>
@@ -12,10 +18,11 @@ INTERFACE zif_brainfuck_compiler
   "! @raising zcx_brainfuck_error | <p class="shorttext synchronized" lang="en"></p>
   METHODS compile
     IMPORTING
-      i_code           TYPE string
-      i_allow_debugger TYPE abap_bool DEFAULT abap_true
+      i_code               TYPE string
+      i_allow_debugger     TYPE abap_bool DEFAULT abap_true
+      i_optimisation_level TYPE enum_optimisation DEFAULT optimisation_levels-full
     EXPORTING
-      et_instructions  TYPE tt_instructions
+      et_instructions      TYPE tt_instructions
     RAISING
       zcx_brainfuck_error.
 ENDINTERFACE.
