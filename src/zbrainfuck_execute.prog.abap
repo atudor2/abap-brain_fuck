@@ -88,7 +88,7 @@ ENDCLASS.
 *" Selection Screen Definition
 *""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 PARAMETERS p_cmplr TYPE seoclskey AS LISTBOX VISIBLE LENGTH 30 OBLIGATORY. " Compiler Class
-PARAMETERS p_exec  TYPE seoclskey AS LISTBOX VISIBLE LENGTH 30 OBLIGATORY. " Execution Class
+PARAMETERS p_exec TYPE seoclskey AS LISTBOX VISIBLE LENGTH 30 OBLIGATORY. " Execution Class
 
 PARAMETERS p_instr1 TYPE abap_bool RADIOBUTTON GROUP inst DEFAULT 'X'. " Do not dump instructions
 PARAMETERS p_instr2 TYPE abap_bool RADIOBUTTON GROUP inst.             " Dump instructions
@@ -148,7 +148,11 @@ CLASS lcl_application IMPLEMENTATION.
   ENDMETHOD.
 
   METHOD print.
-    WRITE: / i_value.
+    SPLIT i_value AT cl_abap_char_utilities=>cr_lf INTO TABLE DATA(lines).
+
+    LOOP AT lines ASSIGNING FIELD-SYMBOL(<line>).
+      WRITE: / <line>.
+    ENDLOOP.
   ENDMETHOD.
 
   METHOD run.
@@ -185,6 +189,7 @@ CLASS lcl_application IMPLEMENTATION.
         print( syntax_ex->get_error_message( ) ).
       CATCH zcx_brainfuck_error INTO DATA(ex).
         print( ex->get_text( ) ).
+        print( ex->get_longtext( ) ).
     ENDTRY.
   ENDMETHOD.
 
