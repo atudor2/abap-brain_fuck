@@ -30,6 +30,14 @@ CLASS zcl_brainfuck_code_gen DEFINITION
     CLASS-METHODS get_dyn_program_footer
       RETURNING
         VALUE(r_result) TYPE tt_prog_src.
+
+    CLASS-METHODS generate_subroutine
+      IMPORTING
+        it_prog_src     TYPE zcl_brainfuck_code_gen=>tt_prog_src
+      RETURNING
+        VALUE(r_result) TYPE string
+      RAISING
+        zcx_brainfuck_code_gen_error.
 ENDCLASS.
 
 CLASS zcl_brainfuck_code_gen IMPLEMENTATION.
@@ -133,8 +141,7 @@ CLASS zcl_brainfuck_code_gen IMPLEMENTATION.
     " Program footer:
     APPEND LINES OF get_dyn_program_footer( ) TO prog_src.
 
-    GENERATE SUBROUTINE POOL prog_src NAME DATA(dyn_prog).
-    DATA(dyn_class) = `\PROGRAM=` && dyn_prog && `\CLASS=MAIN`.
+    DATA(dyn_class) = generate_subroutine( prog_src ).
 
     et_source_code[] = prog_src[].
     CREATE OBJECT r_result TYPE (dyn_class).
@@ -143,9 +150,9 @@ CLASS zcl_brainfuck_code_gen IMPLEMENTATION.
   METHOD zif_brainfuck_executor~execute.
     " Generate and immediately call the dyn object
     DATA(dyn_exec) = generate_program(
-                   EXPORTING
-                     it_instructions     = it_instructions
-                     i_memory_cells      = i_memory_cells ).
+                           EXPORTING
+                             it_instructions     = it_instructions
+                             i_memory_cells      = i_memory_cells ).
 
     dyn_exec->execute(
       EXPORTING
@@ -153,5 +160,25 @@ CLASS zcl_brainfuck_code_gen IMPLEMENTATION.
         ir_input            = ir_input
         ir_output           = ir_output
         i_memory_cells      = i_memory_cells ).
+  ENDMETHOD.
+
+  METHOD generate_subroutine.
+    DATA syntax_error_info TYPE zcx_brainfuck_code_gen_error=>t_syntax_error.
+
+    GENERATE SUBROUTINE POOL it_prog_src NAME    DATA(dyn_prog)
+                                         MESSAGE syntax_error_info-message
+                                         LINE    syntax_error_info-line
+                                         OFFSET  syntax_error_info-offset
+                                         WORD    syntax_error_info-word.
+
+    IF sy-subrc <> 0.
+      " Generation error
+      RAISE EXCEPTION TYPE zcx_brainfuck_code_gen_error
+        EXPORTING
+          it_program_source = CONV #( it_prog_src )
+          i_syntax_error    = syntax_error_info.
+    ENDIF.
+
+    r_result = `\PROGRAM=` && dyn_prog && `\CLASS=MAIN`.
   ENDMETHOD.
 ENDCLASS.
