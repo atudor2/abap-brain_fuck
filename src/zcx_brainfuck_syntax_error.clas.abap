@@ -52,13 +52,11 @@ CLASS ZCX_BRAINFUCK_SYNTAX_ERROR IMPLEMENTATION.
     " [Source Code]
     " -----^ (pointer to error)
 
-    DATA lf TYPE c VALUE cl_abap_char_utilities=>cr_lf.
-
-    r_result = |Syntax error:{ lf }{ me->message }{ lf }At character offset: { location }{ lf }{ me->source_code }|.
+    r_result = |Syntax error:\n{ me->message }\nAt character offset: { location }\n{ me->source_code }|.
 
     " Create the error indicator line
     DATA(error_ind) = REDUCE #( INIT s = || FOR i = 1 UNTIL i > me->location NEXT s = s && '-' ) && '^'.
 
-    r_result = r_result && lf && error_ind.
+    r_result = |{ r_result }\n{ error_ind }|.
   ENDMETHOD.
 ENDCLASS.
