@@ -63,7 +63,7 @@ ENDCLASS.
 
 
 
-CLASS ZCL_BRAINFUCK_INTERPRETER IMPLEMENTATION.
+CLASS zcl_brainfuck_interpreter IMPLEMENTATION.
 
 
   METHOD call_inspector_end.
@@ -164,13 +164,15 @@ CLASS ZCL_BRAINFUCK_INTERPRETER IMPLEMENTATION.
 
 
   METHOD write_string_to_output.
+    DATA(i) = -1.
     DO strlen( i_string ) TIMES.
-      DATA(i) = sy-index.
+      i = i + 1.
 
       DATA(c) = i_string+i(1).
       ir_output->write_character( cl_abap_conv_out_ce=>uccpi( char = c ) ).
-      ir_output->flush( ).
     ENDDO.
+
+    ir_output->flush( ).
   ENDMETHOD.
 
 
