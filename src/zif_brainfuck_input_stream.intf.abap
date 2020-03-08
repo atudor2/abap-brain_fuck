@@ -3,7 +3,7 @@ INTERFACE zif_brainfuck_input_stream
   PUBLIC .
 
   "! Character byte
-  TYPES t_character_byte TYPE int1.
+  TYPES t_character_byte TYPE zif_brainfuck_instruction=>t_memory_cell.
 
   "! <p class="shorttext synchronized" lang="en">Reads a character from the Input Stream</p>
   "! @parameter r_result | <p class="shorttext synchronized" lang="en">Character byte or 0 for EOF</p>
