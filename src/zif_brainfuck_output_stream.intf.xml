@@ -23,12 +23,6 @@
      <LANGU>E</LANGU>
      <DESCRIPT>Writes a single character to the output stream</DESCRIPT>
     </SEOCOMPOTX>
-    <SEOCOMPOTX>
-     <CLSNAME>ZIF_BRAINFUCK_OUTPUT_STREAM</CLSNAME>
-     <CMPNAME>WRITE_STRING</CMPNAME>
-     <LANGU>E</LANGU>
-     <DESCRIPT>Writes a string to the output stream</DESCRIPT>
-    </SEOCOMPOTX>
    </DESCRIPTIONS>
   </asx:values>
  </asx:abap>

@@ -2,11 +2,11 @@
 INTERFACE zif_brainfuck_input_stream
   PUBLIC .
 
-  "! Single length character
-  TYPES t_character TYPE c LENGTH 1.
+  "! Character byte
+  TYPES t_character_byte TYPE int1.
 
   "! <p class="shorttext synchronized" lang="en">Reads a character from the Input Stream</p>
-  "! @parameter r_result | <p class="shorttext synchronized" lang="en"></p>
+  "! @parameter r_result | <p class="shorttext synchronized" lang="en">Character byte or 0 for EOF</p>
   METHODS read_character
-    RETURNING VALUE(r_result) TYPE t_character.
+    RETURNING VALUE(r_result) TYPE t_character_byte.
 ENDINTERFACE.

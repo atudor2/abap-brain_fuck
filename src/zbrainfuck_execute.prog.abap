@@ -11,9 +11,6 @@ REPORT zbrainfuck_execute.
 CLASS lcl_application DEFINITION
   CREATE PRIVATE.
   PUBLIC SECTION.
-    INTERFACES zif_brainfuck_input_stream.
-    INTERFACES zif_brainfuck_output_stream.
-
     TYPES:
       BEGIN OF t_class_pair,
         execution_class TYPE string,
@@ -37,9 +34,12 @@ CLASS lcl_application DEFINITION
     CLASS-METHODS pbo.
     CLASS-METHODS initialise.
     CLASS-METHODS pai.
+
+    CLASS-METHODS print
+      IMPORTING
+        i_value TYPE string.
   PROTECTED SECTION.
   PRIVATE SECTION.
-    DATA output_buffer TYPE string.
     DATA class_pairs TYPE lcl_application=>t_class_pair.
     DATA enable_debug_instructions TYPE abap_bool.
     DATA instruction_dump_method TYPE lcl_application=>instruction_dump_meth.
@@ -60,10 +60,6 @@ CLASS lcl_application DEFINITION
 
     METHODS run.
 
-    METHODS print
-      IMPORTING
-        i_value TYPE string.
-
     METHODS dump_instructions
       IMPORTING
         it_instructions TYPE zif_brainfuck_instruction=>tt_instructions.
@@ -82,6 +78,18 @@ CLASS lcl_application DEFINITION
     CLASS-METHODS get_instruction_dump_method
       RETURNING
         VALUE(r_result) TYPE instruction_dump_meth.
+ENDCLASS.
+
+CLASS lcl_in_out_stream DEFINITION CREATE PUBLIC.
+  PUBLIC SECTION.
+    INTERFACES zif_brainfuck_input_stream.
+    INTERFACES zif_brainfuck_output_stream.
+  PROTECTED SECTION.
+  PRIVATE SECTION.
+    DATA output_buffer TYPE string.
+    DATA input_buffer TYPE STANDARD TABLE OF c WITH EMPTY KEY.
+    DATA first_read_call TYPE abap_bool VALUE abap_true.
+    METHODS fill_input_buffer.
 ENDCLASS.
 
 *""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -126,28 +134,6 @@ CLASS lcl_application IMPLEMENTATION.
     instance->run( ).
   ENDMETHOD.
 
-  METHOD zif_brainfuck_output_stream~flush.
-    print( me->output_buffer ).
-
-    CLEAR me->output_buffer.
-  ENDMETHOD.
-
-  METHOD zif_brainfuck_input_stream~read_character.
-    cl_demo_input=>request(
-      EXPORTING
-        text        = 'Input:'
-      CHANGING
-        field       = r_result ).
-  ENDMETHOD.
-
-  METHOD zif_brainfuck_output_stream~write_character.
-    CONCATENATE me->output_buffer i_character INTO me->output_buffer RESPECTING BLANKS. " Got to love automatic string trims... ;)
-  ENDMETHOD.
-
-  METHOD zif_brainfuck_output_stream~write_string.
-    me->output_buffer = me->output_buffer && i_string.
-  ENDMETHOD.
-
   METHOD print.
     SPLIT i_value AT cl_abap_char_utilities=>newline INTO TABLE DATA(lines).
 
@@ -161,6 +147,7 @@ CLASS lcl_application IMPLEMENTATION.
 
     DATA(compiler) = me->get_compiler( ).
     DATA(executor) = me->get_executor( ).
+    DATA(input_output) = NEW lcl_in_out_stream( ).
 
     TRY.
         GET RUN TIME FIELD DATA(compile_time).
@@ -183,8 +170,8 @@ CLASS lcl_application IMPLEMENTATION.
         executor->execute(
             EXPORTING
                 it_instructions     = instructions
-                ir_input            = me
-                ir_output           = me ).
+                ir_input            = input_output
+                ir_output           = input_output ).
 
         GET RUN TIME FIELD runtime.
         print( |Runtime: { runtime } microseconds| ).
@@ -199,7 +186,7 @@ CLASS lcl_application IMPLEMENTATION.
   METHOD dump_instructions.
     CHECK me->instruction_dump_method <> no_dump.
 
-    DATA(total_instrs) = conv f( lines( it_instructions ) ).
+    DATA(total_instrs) = CONV f( lines( it_instructions ) ).
     DATA(padding) = CONV i( log10( total_instrs ) ) + 1.
 
     DATA(i) = 0.
@@ -319,4 +306,56 @@ CLASS lcl_application IMPLEMENTATION.
                        WHEN p_instr3 = abap_true THEN full_dump ).
   ENDMETHOD.
 
+ENDCLASS.
+
+CLASS lcl_in_out_stream IMPLEMENTATION.
+  METHOD zif_brainfuck_output_stream~flush.
+    lcl_application=>print( me->output_buffer ).
+
+    CLEAR me->output_buffer.
+  ENDMETHOD.
+
+  METHOD zif_brainfuck_input_stream~read_character.
+    " First call?
+    IF first_read_call = abap_true.
+      fill_input_buffer( ).
+      first_read_call = abap_false.
+    ENDIF.
+
+    DATA(end_index) = lines( me->input_buffer ).
+
+    IF end_index = 0.
+      r_result = 0. "EOF
+      RETURN.
+    ENDIF.
+
+    DATA(c) =  me->input_buffer[ end_index ].
+    DELETE me->input_buffer INDEX end_index.
+
+    r_result = cl_abap_conv_out_ce=>uccpi( char = c ).
+  ENDMETHOD.
+
+  METHOD zif_brainfuck_output_stream~write_character.
+    TYPES t_char TYPE c LENGTH 1.
+
+    DATA(char) = CONV t_char( cl_abap_conv_in_ce=>uccpi( CONV #( i_character ) ) ).
+    CONCATENATE me->output_buffer char INTO me->output_buffer RESPECTING BLANKS. " Got to love automatic string trims... ;)
+  ENDMETHOD.
+
+  METHOD fill_input_buffer.
+    " Request all input up front
+    DATA(input) = ||.
+
+    cl_demo_input=>request(
+      EXPORTING
+        text        = 'All Input for execution:'
+      CHANGING
+        field       = input ).
+
+    " Fill buffer backwards so that the next character can be 'popped' off
+    " and not require a table index change
+    DATA(j) = strlen( input ) - 1.
+
+    me->input_buffer = VALUE #( FOR i = j THEN i - 1 UNTIL i < 0  ( CONV char1( input+i(1) ) ) ).
+  ENDMETHOD.
 ENDCLASS.
