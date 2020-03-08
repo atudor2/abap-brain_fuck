@@ -54,6 +54,12 @@
     </item>
     <item>
      <ID>S</ID>
+     <KEY>P_NORUN</KEY>
+     <ENTRY>Compilation only?</ENTRY>
+     <LENGTH>25</LENGTH>
+    </item>
+    <item>
+     <ID>S</ID>
      <KEY>P_OPTIM</KEY>
      <ENTRY>Enable Optimisations?</ENTRY>
      <LENGTH>29</LENGTH>

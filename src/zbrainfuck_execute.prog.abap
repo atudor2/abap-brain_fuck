@@ -80,6 +80,9 @@ CLASS lcl_application DEFINITION
         VALUE(r_result) TYPE instruction_dump_meth.
 ENDCLASS.
 
+*""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+*" Input/Output Stream (Definition)
+*""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 CLASS lcl_in_out_stream DEFINITION CREATE PUBLIC.
   PUBLIC SECTION.
     INTERFACES zif_brainfuck_input_stream.
@@ -104,6 +107,7 @@ PARAMETERS p_instr3 TYPE abap_bool RADIOBUTTON GROUP inst.             " Dump in
 
 PARAMETERS p_debug TYPE abap_bool AS CHECKBOX.             " Enable debug instruction?
 PARAMETERS p_optim TYPE abap_bool AS CHECKBOX DEFAULT 'X'. " Enable Optimisations?
+PARAMETERS p_norun TYPE abap_bool AS CHECKBOX.             " Only compile, do not execute
 
 *""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 *" Selection Screen Events
@@ -165,6 +169,11 @@ CLASS lcl_application IMPLEMENTATION.
         print( |Compile Time: { compile_time } microseconds| ).
 
         me->dump_instructions( it_instructions = instructions ).
+
+        IF p_norun = abap_true.
+          " compile only
+          RETURN.
+        ENDIF.
 
         GET RUN TIME FIELD DATA(runtime).
         executor->execute(
@@ -309,6 +318,9 @@ CLASS lcl_application IMPLEMENTATION.
 
 ENDCLASS.
 
+*""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+*" Input/Output Stream (Implementation)
+*""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 CLASS lcl_in_out_stream IMPLEMENTATION.
   METHOD zif_brainfuck_output_stream~flush.
     lcl_application=>print( me->output_buffer ).
