@@ -142,10 +142,14 @@ CLASS zcl_brainfuck_code_gen IMPLEMENTATION.
           ENDDO.
 
         WHEN zif_brainfuck_instruction=>instruction_type-jmp_if_zero.
-          APPEND |WHILE cell <> 0.| TO prog_src.
+          DO <instruction>->repeated TIMES.
+            APPEND |WHILE cell <> 0.| TO prog_src.
+          ENDDO.
 
         WHEN zif_brainfuck_instruction=>instruction_type-jmp_if_not_zero.
-          APPEND |ENDWHILE.| TO prog_src.
+          DO <instruction>->repeated TIMES.
+            APPEND |ENDWHILE.| TO prog_src.
+          ENDDO.
 
         WHEN zif_brainfuck_instruction=>instruction_type-debugger.
           " Just a BREAK-POINT for the # command
