@@ -191,6 +191,8 @@ CLASS lcl_application IMPLEMENTATION.
 
     DATA(i) = 0.
     LOOP AT it_instructions ASSIGNING FIELD-SYMBOL(<ins>).
+      i = i + 1.
+
       " Skip comments and debug commands if basic dump
       IF me->instruction_dump_method = basic_dump AND
          ( <ins>->type = <ins>->instruction_type-comment OR
@@ -198,7 +200,6 @@ CLASS lcl_application IMPLEMENTATION.
         CONTINUE.
       ENDIF.
 
-      i = i + 1.
       print( |[{ i PAD = '0' ALIGN = RIGHT WIDTH = padding }] Source: { <ins>->source_code_location } -> { <ins>->type }(x{ <ins>->repeated })[Argument = { <ins>->argument }]| ).
     ENDLOOP.
   ENDMETHOD.
