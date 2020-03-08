@@ -54,52 +54,50 @@ CLASS zcl_brainfuck_interpreter DEFINITION
         ir_state        TYPE REF TO lcl_execution_state
       RETURNING
         VALUE(r_result) TYPE zif_brainfuck_inspector=>t_execution_state.
+
+    METHODS write_string_to_output
+      IMPORTING
+        i_string  TYPE string
+        ir_output TYPE REF TO zif_brainfuck_output_stream.
 ENDCLASS.
 
-CLASS zcl_brainfuck_interpreter IMPLEMENTATION.
+
+
+CLASS ZCL_BRAINFUCK_INTERPRETER IMPLEMENTATION.
+
+
+  METHOD call_inspector_end.
+    CHECK ir_inspector IS BOUND.
+
+    ir_inspector->end_of_instruction( i_state = get_state_for_inspector( ir_state ) ).
+  ENDMETHOD.
+
+
+  METHOD call_inspector_start.
+    CHECK ir_inspector IS BOUND.
+
+    ir_inspector->start_of_instruction( i_state = get_state_for_inspector( ir_state ) ).
+  ENDMETHOD.
+
 
   METHOD dump_execution_state.
     ir_output->flush( ).
 
     DATA(dbg_msg) = |IP = { ir_exec_state->instruction_pointer }, DP = { ir_exec_state->data_pointer }, Instruction = { CONV string( ir_exec_state->current_instruction_type ) }|.
 
-    ir_output->write_string( i_string = dbg_msg ).
-    ir_output->flush( ).
-  ENDMETHOD.
-
-  METHOD read_char.
-    r_result = cl_abap_conv_out_ce=>uccpi( char = ir_input->read_character( ) ).
+    write_string_to_output( i_string = dbg_msg ir_output = ir_output ).
   ENDMETHOD.
 
 
-  METHOD write_char.
-    DATA(char) = CONV zif_brainfuck_output_stream=>t_character( cl_abap_conv_in_ce=>uccpi( CONV #( i_value ) ) ).
-    ir_output->write_character( char ).
+  METHOD get_state_for_inspector.
+    r_result = VALUE #(
+        data_pointer        = ir_state->data_pointer
+        instruction         = ir_state->current_instruction
+        instruction_pointer = ir_state->instruction_pointer
+        memory_cells        = REF #( ir_state->memory_cells )
+    ).
   ENDMETHOD.
 
-
-  METHOD zif_brainfuck_executor~execute.
-    DATA(exec_state) = NEW lcl_execution_state(
-        it_instructions = it_instructions
-        i_memory_cells  = i_memory_cells  ).
-
-    " Execution Loop
-    WHILE exec_state->has_instructions( ).
-
-      call_inspector_start( ir_inspector = ir_inspector ir_state = exec_state ).
-
-      me->handle_instruction(
-        ir_state  = exec_state
-        ir_input  = ir_input
-        ir_output = ir_output
-      ).
-
-      call_inspector_end( ir_inspector = ir_inspector ir_state = exec_state ).
-    ENDWHILE.
-
-    " Flush output stream
-    ir_output->flush( ).
-  ENDMETHOD.
 
   METHOD handle_instruction.
     DATA(exec_state) = ir_state.
@@ -154,25 +152,48 @@ CLASS zcl_brainfuck_interpreter IMPLEMENTATION.
     exec_state->next_instruction( ).
   ENDMETHOD.
 
-  METHOD call_inspector_start.
-    CHECK ir_inspector IS BOUND.
 
-    ir_inspector->start_of_instruction( i_state = get_state_for_inspector( ir_state ) ).
+  METHOD read_char.
+    r_result = ir_input->read_character( ).
   ENDMETHOD.
 
 
-  METHOD call_inspector_end.
-    CHECK ir_inspector IS BOUND.
-
-    ir_inspector->end_of_instruction( i_state = get_state_for_inspector( ir_state ) ).
+  METHOD write_char.
+    ir_output->write_character( i_value ).
   ENDMETHOD.
 
-  METHOD get_state_for_inspector.
-    r_result = VALUE #(
-        data_pointer        = ir_state->data_pointer
-        instruction         = ir_state->current_instruction
-        instruction_pointer = ir_state->instruction_pointer
-        memory_cells        = REF #( ir_state->memory_cells )
-    ).
+
+  METHOD write_string_to_output.
+    DO strlen( i_string ) TIMES.
+      DATA(i) = sy-index.
+
+      DATA(c) = i_string+i(1).
+      ir_output->write_character( cl_abap_conv_out_ce=>uccpi( char = c ) ).
+      ir_output->flush( ).
+    ENDDO.
+  ENDMETHOD.
+
+
+  METHOD zif_brainfuck_executor~execute.
+    DATA(exec_state) = NEW lcl_execution_state(
+        it_instructions = it_instructions
+        i_memory_cells  = i_memory_cells  ).
+
+    " Execution Loop
+    WHILE exec_state->has_instructions( ).
+
+      call_inspector_start( ir_inspector = ir_inspector ir_state = exec_state ).
+
+      me->handle_instruction(
+        ir_state  = exec_state
+        ir_input  = ir_input
+        ir_output = ir_output
+      ).
+
+      call_inspector_end( ir_inspector = ir_inspector ir_state = exec_state ).
+    ENDWHILE.
+
+    " Flush output stream
+    ir_output->flush( ).
   ENDMETHOD.
 ENDCLASS.
