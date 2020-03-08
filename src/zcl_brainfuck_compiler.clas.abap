@@ -75,6 +75,11 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
         CONTINUE.
       ENDIF.
 
+      " Skip comments if optimisation is on
+      IF token = zif_brainfuck_instruction=>instruction_type-comment AND is_optimised = abap_true.
+        CONTINUE.
+      ENDIF.
+
       " If same as last token, then bump the REPEAT value...
       DATA(insertion) = add_or_fold_instruction( EXPORTING i_token     = token
                                                            i_location  = location
