@@ -24,13 +24,18 @@ CLASS zcl_brainfuck_compiler DEFINITION
       IMPORTING
         i_token         TYPE zif_brainfuck_instruction=>t_instruction_type
         i_location      TYPE i
-        i_optimised type abap_bool
+        i_optimised     TYPE abap_bool
       CHANGING
         ct_instructions TYPE zif_brainfuck_instruction=>tt_instructions
       RETURNING
         VALUE(r_result) TYPE t_added_instruction
       RAISING
         zcx_brainfuck_error.
+    METHODS can_token_fold
+      IMPORTING
+        i_token         TYPE zif_brainfuck_instruction=>t_instruction_type
+      RETURNING
+        VALUE(r_result) TYPE abap_bool.
 
 ENDCLASS.
 
@@ -62,6 +67,9 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
 
       DATA(token) = char_to_instruction( char ).
 
+      " There could be multiple optimisation levels, but for us its an ON/OFF switch
+      DATA(is_optimised) = xsdbool( i_optimisation_level <> zif_brainfuck_compiler=>optimisation_levels-none ).
+
       " Allow debugger calls?
       IF token = zif_brainfuck_instruction=>instruction_type-debugger AND i_allow_debugger <> abap_true.
         CONTINUE.
@@ -70,7 +78,7 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
       " If same as last token, then bump the REPEAT value...
       DATA(insertion) = add_or_fold_instruction( EXPORTING i_token     = token
                                                            i_location  = location
-                                                           i_optimised = xsdbool( i_optimisation_level <> zif_brainfuck_compiler=>optimisation_levels-none )
+                                                           i_optimised = is_optimised
                                                  CHANGING  ct_instructions = et_instructions ).
 
       " Handle loops to set the open/close index
@@ -141,12 +149,13 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
     DATA last_instruction TYPE REF TO zif_brainfuck_instruction.
 
     " If the last instruction is the same, just bump the REPEAT if optmisations are on
+    " and the token can be folded
     DATA(count) = lines( ct_instructions ).
     IF count > 0.
       last_instruction = ct_instructions[ count ].
     ENDIF.
 
-    IF i_optimised = abap_true AND last_instruction IS BOUND AND last_instruction->type = i_token.
+    IF i_optimised = abap_true AND can_token_fold( i_token ) AND last_instruction IS BOUND AND last_instruction->type = i_token.
       " Nothing to add, just bump the REPEAT
       last_instruction->repeated = last_instruction->repeated + 1.
 
@@ -165,5 +174,14 @@ CLASS zcl_brainfuck_compiler IMPLEMENTATION.
 
     r_result = VALUE #( instruction  = instruction
                         insert_index = sy-tabix ).
+  ENDMETHOD.
+
+  METHOD can_token_fold.
+    r_result = SWITCH #( i_token
+                  " The open and close loop instructions can never be optimised as this will
+                  " change the semantics of the program
+                  WHEN zif_brainfuck_instruction=>instruction_type-jmp_if_zero     THEN abap_false
+                  WHEN zif_brainfuck_instruction=>instruction_type-jmp_if_not_zero THEN abap_false
+                  ELSE abap_true ).
   ENDMETHOD.
 ENDCLASS.
