@@ -21,4 +21,8 @@ INTERFACE zif_brainfuck_inspector
   METHODS end_of_instruction
     IMPORTING
       i_state TYPE t_execution_state.
+
+  METHODS on_debug_instruction DEFAULT IGNORE
+    IMPORTING
+      i_state TYPE t_execution_state.
 ENDINTERFACE.

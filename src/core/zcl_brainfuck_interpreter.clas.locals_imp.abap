@@ -1,6 +1,7 @@
 *"* use this source file for the definition and implementation of
 *"* local helper classes, interface definitions and type
 *"* declarations
+
 CLASS lcl_execution_state IMPLEMENTATION.
   METHOD constructor.
     super->constructor( ).

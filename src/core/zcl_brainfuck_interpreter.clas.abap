@@ -25,19 +25,12 @@ CLASS zcl_brainfuck_interpreter DEFINITION
       RETURNING
         VALUE(r_result) TYPE zif_brainfuck_instruction=>t_memory_cell.
 
-    "! <p class="shorttext synchronized" lang="en"></p>
-    "! @parameter ir_exec_state | <p class="shorttext synchronized" lang="en"></p>
-    "! @parameter ir_output | <p class="shorttext synchronized" lang="en"></p>
-    METHODS dump_execution_state
-      IMPORTING
-        ir_exec_state TYPE REF TO lcl_execution_state
-        ir_output     TYPE REF TO zif_brainfuck_output_stream.
-
     METHODS handle_instruction
       IMPORTING
-        ir_state  TYPE REF TO lcl_execution_state
-        ir_input  TYPE REF TO zif_brainfuck_input_stream
-        ir_output TYPE REF TO zif_brainfuck_output_stream
+        ir_state     TYPE REF TO lcl_execution_state
+        ir_input     TYPE REF TO zif_brainfuck_input_stream
+        ir_output    TYPE REF TO zif_brainfuck_output_stream
+        ir_inspector TYPE REF TO zif_brainfuck_inspector
       RAISING
         zcx_brainfuck_error.
     METHODS call_inspector_start
@@ -49,22 +42,21 @@ CLASS zcl_brainfuck_interpreter DEFINITION
         ir_inspector TYPE REF TO zif_brainfuck_inspector
         ir_state     TYPE REF TO lcl_execution_state.
 
+    METHODS call_inspector_debug
+      IMPORTING
+        ir_inspector TYPE REF TO zif_brainfuck_inspector
+        ir_state     TYPE REF TO lcl_execution_state.
+
     METHODS get_state_for_inspector
       IMPORTING
         ir_state        TYPE REF TO lcl_execution_state
       RETURNING
         VALUE(r_result) TYPE zif_brainfuck_inspector=>t_execution_state.
-
-    METHODS write_string_to_output
-      IMPORTING
-        i_string  TYPE string
-        ir_output TYPE REF TO zif_brainfuck_output_stream.
 ENDCLASS.
 
 
 
 CLASS zcl_brainfuck_interpreter IMPLEMENTATION.
-
 
   METHOD call_inspector_end.
     CHECK ir_inspector IS BOUND.
@@ -79,15 +71,11 @@ CLASS zcl_brainfuck_interpreter IMPLEMENTATION.
     ir_inspector->start_of_instruction( i_state = get_state_for_inspector( ir_state ) ).
   ENDMETHOD.
 
+  METHOD call_inspector_debug.
+    CHECK ir_inspector IS BOUND.
 
-  METHOD dump_execution_state.
-    ir_output->flush( ).
-
-    DATA(dbg_msg) = |IP = { ir_exec_state->instruction_pointer }, DP = { ir_exec_state->data_pointer }, Instruction = { CONV string( ir_exec_state->current_instruction_type ) }|.
-
-    write_string_to_output( i_string = dbg_msg ir_output = ir_output ).
+    ir_inspector->on_debug_instruction( i_state = get_state_for_inspector( ir_state ) ).
   ENDMETHOD.
-
 
   METHOD get_state_for_inspector.
     r_result = VALUE #(
@@ -97,7 +85,6 @@ CLASS zcl_brainfuck_interpreter IMPLEMENTATION.
         memory_cells        = REF #( ir_state->memory_cells )
     ).
   ENDMETHOD.
-
 
   METHOD handle_instruction.
     DATA(exec_state) = ir_state.
@@ -140,9 +127,8 @@ CLASS zcl_brainfuck_interpreter IMPLEMENTATION.
         ENDIF.
 
       WHEN zif_brainfuck_instruction=>instruction_type-debugger.
-        " Print state of executor
-        me->dump_execution_state( ir_exec_state = exec_state
-                                  ir_output     = ir_output ).
+        " Trigger debug callback
+        call_inspector_debug( ir_inspector = ir_inspector ir_state = exec_state ).
       WHEN zif_brainfuck_instruction=>instruction_type-comment.
         " NOP
       WHEN OTHERS.
@@ -152,29 +138,13 @@ CLASS zcl_brainfuck_interpreter IMPLEMENTATION.
     exec_state->next_instruction( ).
   ENDMETHOD.
 
-
   METHOD read_char.
     r_result = ir_input->read_character( ).
   ENDMETHOD.
 
-
   METHOD write_char.
     ir_output->write_character( i_value ).
   ENDMETHOD.
-
-
-  METHOD write_string_to_output.
-    DATA(i) = -1.
-    DO strlen( i_string ) TIMES.
-      i = i + 1.
-
-      DATA(c) = i_string+i(1).
-      ir_output->write_character( cl_abap_conv_out_ce=>uccpi( char = c ) ).
-    ENDDO.
-
-    ir_output->flush( ).
-  ENDMETHOD.
-
 
   METHOD zif_brainfuck_executor~execute.
     DATA(exec_state) = NEW lcl_execution_state(
@@ -187,9 +157,10 @@ CLASS zcl_brainfuck_interpreter IMPLEMENTATION.
       call_inspector_start( ir_inspector = ir_inspector ir_state = exec_state ).
 
       me->handle_instruction(
-        ir_state  = exec_state
-        ir_input  = ir_input
-        ir_output = ir_output
+        ir_state     = exec_state
+        ir_input     = ir_input
+        ir_output    = ir_output
+        ir_inspector = ir_inspector
       ).
 
       call_inspector_end( ir_inspector = ir_inspector ir_state = exec_state ).
@@ -198,4 +169,5 @@ CLASS zcl_brainfuck_interpreter IMPLEMENTATION.
     " Flush output stream
     ir_output->flush( ).
   ENDMETHOD.
+
 ENDCLASS.
