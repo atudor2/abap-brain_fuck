@@ -196,6 +196,11 @@ CLASS lcl_application IMPLEMENTATION.
     CHECK me->instruction_dump_method <> no_dump.
 
     DATA(total_instrs) = CONV f( lines( it_instructions ) ).
+    IF total_instrs = 0.
+      print( |[Empty instruction list]| ).
+      RETURN.
+    ENDIF.
+
     DATA(padding) = CONV i( log10( total_instrs ) ) + 1.
 
     DATA(i) = 0.
