@@ -24,7 +24,7 @@ ENDCLASS.
 
 
 
-CLASS ZCX_BRAINFUCK_SYNTAX_ERROR IMPLEMENTATION.
+CLASS zcx_brainfuck_syntax_error IMPLEMENTATION.
 
 
   METHOD constructor ##ADT_SUPPRESS_GENERATION.
@@ -52,11 +52,46 @@ CLASS ZCX_BRAINFUCK_SYNTAX_ERROR IMPLEMENTATION.
     " [Source Code]
     " -----^ (pointer to error)
 
-    r_result = |Syntax error:\n{ me->message }\nAt character offset: { location }\n{ me->source_code }|.
+    r_result =  |Syntax error:\n{ me->message }\nAt character offset: { location }\n|.
+    IF location <= 0.
+      RETURN.
+    ENDIF.
 
-    " Create the error indicator line
-    DATA(error_ind) = REDUCE #( INIT s = || FOR i = 1 UNTIL i > me->location NEXT s = s && '-' ) && '^'.
+    " If the source code is multiple lines, the offset should be adjusted and indicator
+    " drawn under the specific line
+    DATA(stream) = NEW cl_abap_string_c_writer( ).
+    stream->write( r_result ).
 
-    r_result = |{ r_result }\n{ error_ind }|.
+    DATA(code_len) = strlen( me->source_code ).
+    DATA(err_location) = COND #( WHEN location > code_len THEN code_len ELSE location ).
+    DATA(offset) = 0.
+    DATA(error_line_drawn) = abap_false.
+
+    SPLIT me->source_code AT |\n| INTO TABLE DATA(code_lines).
+
+    LOOP AT code_lines ASSIGNING FIELD-SYMBOL(<line>).
+      stream->write( <line> ).
+      stream->write( |\n| ).
+
+      IF error_line_drawn = abap_true.
+        CONTINUE. " Line already drawn
+      ENDIF.
+
+      DATA(line_len) = strlen( <line> ) + 1. " Add the new line again
+      offset = offset + line_len.
+
+      IF offset < err_location.
+        CONTINUE.
+      ENDIF.
+
+      " Write the error marker:
+      DATA(adj_err_location) = err_location - ( offset - line_len ).
+
+      DATA(error_ind) = |{ '^' ALIGN = RIGHT WIDTH = adj_err_location PAD = '-' }\n|.
+      stream->write( error_ind ).
+      error_line_drawn = abap_true.
+    ENDLOOP.
+
+    r_result = stream->get_result_string( ).
   ENDMETHOD.
 ENDCLASS.
