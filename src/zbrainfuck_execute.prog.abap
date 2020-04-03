@@ -78,6 +78,11 @@ CLASS lcl_application DEFINITION
     CLASS-METHODS get_instruction_dump_method
       RETURNING
         VALUE(r_result) TYPE instruction_dump_meth.
+
+    CLASS-METHODS stash_code.
+
+    CLASS-METHODS retrieve_stashed_code
+      RETURNING VALUE(r_result) TYPE string.
 ENDCLASS.
 
 *""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -129,6 +134,8 @@ START-OF-SELECTION.
 *""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 CLASS lcl_application IMPLEMENTATION.
   METHOD main.
+    lcl_application=>stash_code( ).
+
     DATA(instance) = NEW lcl_application(
         i_parse_debug_instr = p_debug
         i_class_pair        = VALUE #( compiler_class  = p_cmplr
@@ -238,6 +245,8 @@ CLASS lcl_application IMPLEMENTATION.
     text_editor->set_grid_handle( 0 ).
     text_editor->set_statusbar_mode( 0 ).
     text_editor->set_toolbar_mode( 0 ).
+
+    text_editor->set_textstream( lcl_application=>retrieve_stashed_code( ) ).
   ENDMETHOD.
 
   METHOD init_class_dropdown.
@@ -319,6 +328,18 @@ CLASS lcl_application IMPLEMENTATION.
     r_result = COND #( WHEN p_instr1 = abap_true THEN no_dump
                        WHEN p_instr2 = abap_true THEN basic_dump
                        WHEN p_instr3 = abap_true THEN full_dump ).
+  ENDMETHOD.
+
+  METHOD stash_code.
+    DATA(code) = get_code( ).
+    EXPORT code FROM code TO MEMORY ID 'f'.
+  ENDMETHOD.
+
+  METHOD retrieve_stashed_code.
+    IMPORT code = r_result FROM MEMORY ID 'f'.
+    IF sy-subrc <> 0.
+      r_result = ||.
+    ENDIF.
   ENDMETHOD.
 
 ENDCLASS.
