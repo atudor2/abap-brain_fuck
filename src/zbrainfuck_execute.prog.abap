@@ -186,6 +186,7 @@ CLASS lcl_application IMPLEMENTATION.
         executor->execute(
             EXPORTING
                 it_instructions     = instructions
+                ir_inspector        = zcl_brainfuck_inspectors=>get_echo_inspector( input_output )
                 ir_input            = input_output
                 ir_output           = input_output ).
 

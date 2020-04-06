@@ -24,7 +24,7 @@ CLASS lcl_echo_inspector IMPLEMENTATION.
   METHOD zif_brainfuck_inspector~on_debug_instruction.
     output->flush( ).
 
-    DATA(dbg_msg) = |IP = { i_state-instruction_pointer }, DP = { i_state-data_pointer }, Instruction = { CONV string( i_state-instruction->type ) }|.
+    DATA(dbg_msg) = |IP = { i_state-instruction_pointer }, DP = { i_state-data_pointer }, Instruction = { CONV string( i_state-instruction->type ) }, cell = { i_state-memory_cells->*[ i_state-data_pointer ] }|.
 
     write_string_to_output( i_string = dbg_msg ir_output = output ).
   ENDMETHOD.
