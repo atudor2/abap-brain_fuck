@@ -5,6 +5,10 @@ CLASS zcl_brainfuck_executor_base DEFINITION
   CREATE PROTECTED .
 
   PUBLIC SECTION.
+    METHODS constructor
+      IMPORTING
+        i_large_cell_values TYPE abap_bool DEFAULT abap_false.
+
   PROTECTED SECTION.
     METHODS adj_cell_value_with_wrap
       IMPORTING
@@ -31,36 +35,63 @@ CLASS zcl_brainfuck_executor_base DEFINITION
       BEGIN OF t_cell_buffer,
         size            TYPE i,
         buffer_template TYPE zif_brainfuck_instruction=>tt_memory_cells,
-      END OF t_cell_buffer.
+      END OF t_cell_buffer,
+
+      BEGIN OF t_cell_value_range,
+        min   TYPE zif_brainfuck_instruction=>t_memory_cell,
+        max   TYPE zif_brainfuck_instruction=>t_memory_cell,
+        range TYPE i,
+      END OF t_cell_value_range.
+
+    DATA:
+      cell_range TYPE t_cell_value_range.
 
     CLASS-DATA memory_cell_buffer TYPE SORTED TABLE OF t_cell_buffer WITH UNIQUE KEY size.
 ENDCLASS.
 
-CLASS zcl_brainfuck_executor_base IMPLEMENTATION.
+
+
+CLASS ZCL_BRAINFUCK_EXECUTOR_BASE IMPLEMENTATION.
+
+
   METHOD adj_cell_value_with_wrap.
-    " Must do integer wrap around - by default ABAP will raise exception on overflow, so handle the situation manually
     DATA int_result TYPE i.
 
     int_result = i_value + i_adjustment.
-    IF int_result < 0.
-      r_result = abs( int_result + 255 ).
-    ELSEIF int_result > 255.
-      r_result = abs( 255 - int_result ).
-    ELSE.
+    DATA(min)   = cell_range-min.
+    DATA(max)   = cell_range-max.
+    DATA(range) = cell_range-range.
+
+    " Handle the wrap around behaviour for int depending on the cell size
+    " with thanks to "CB Bailey" -> https://stackoverflow.com/a/707426
+
+    " Early exit
+    IF int_result <= max AND int_result >= min.
       r_result = int_result.
+      RETURN.
     ENDIF.
+
+    IF int_result < min.
+      int_result = int_result + range * ( ( min - int_result ) / range + 1 ).
+    ENDIF.
+
+    r_result = min + ( int_result - min ) MOD range.
   ENDMETHOD.
 
-  METHOD move_data_pointer.
-    r_result = i_dp + i_shift.
 
-    " Wrap around?
-    IF r_result < 1.
-      r_result = i_max_cells. " Under run of DP -> wrap around
-    ELSEIF r_result > i_max_cells.
-      r_result = 1. " Overrun of DP -> wrap back to 1
+  METHOD constructor.
+    cell_range = VALUE #(
+        min   = -128
+        max   = 127
+    ).
+    IF i_large_cell_values = abap_true.
+      cell_range-min = cl_abap_math=>min_int4.
+      cell_range-max = cl_abap_math=>max_int4.
     ENDIF.
+
+    cell_range-range = cell_range-max - cell_range-min + 1.
   ENDMETHOD.
+
 
   METHOD initialise_memory_cells.
     FIELD-SYMBOLS <buffer> LIKE LINE OF me->memory_cell_buffer.
@@ -76,5 +107,17 @@ CLASS zcl_brainfuck_executor_base IMPLEMENTATION.
     ENDIF.
 
     ct_memory_cells[] = <buffer>-buffer_template[].
+  ENDMETHOD.
+
+
+  METHOD move_data_pointer.
+    r_result = i_dp + i_shift.
+
+    " Wrap around?
+    IF r_result < 1.
+      r_result = i_max_cells. " Under run of DP -> wrap around
+    ELSEIF r_result > i_max_cells.
+      r_result = 1. " Overrun of DP -> wrap back to 1
+    ENDIF.
   ENDMETHOD.
 ENDCLASS.

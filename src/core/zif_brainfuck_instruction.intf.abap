@@ -5,7 +5,7 @@ INTERFACE zif_brainfuck_instruction
   "! Instruction Type Enum (base type)
   TYPES t_instruction_type_char TYPE c LENGTH 1.
   "! Memory Cell Type
-  TYPES t_memory_cell TYPE int1.
+  TYPES t_memory_cell TYPE i.
   "! Memory Cells
   TYPES tt_memory_cells TYPE STANDARD TABLE OF t_memory_cell WITH EMPTY KEY.
 
