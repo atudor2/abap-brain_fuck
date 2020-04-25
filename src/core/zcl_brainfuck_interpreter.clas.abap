@@ -8,17 +8,11 @@ CLASS zcl_brainfuck_interpreter DEFINITION
     INTERFACES zif_brainfuck_executor.
   PROTECTED SECTION.
   PRIVATE SECTION.
-    "! <p class="shorttext synchronized" lang="en">Writes a memory cell to the output stream</p>
-    "! @parameter i_value | <p class="shorttext synchronized" lang="en">Memory Cell </p>
-    "! @parameter ir_output | <p class="shorttext synchronized" lang="en">Output Stream</p>
     METHODS write_char
       IMPORTING
         i_value   TYPE zif_brainfuck_instruction=>t_memory_cell
         ir_output TYPE REF TO zif_brainfuck_output_stream.
 
-    "! <p class="shorttext synchronized" lang="en">Reads a input value (from user, file etc) into a memory cell</p>
-    "! @parameter ir_input | <p class="shorttext synchronized" lang="en">Input Stream</p>
-    "! @parameter r_result | <p class="shorttext synchronized" lang="en">Memory Cell value</p>
     METHODS read_char
       IMPORTING
         ir_input        TYPE REF TO zif_brainfuck_input_stream
@@ -53,8 +47,6 @@ CLASS zcl_brainfuck_interpreter DEFINITION
       RETURNING
         VALUE(r_result) TYPE zif_brainfuck_inspector=>t_execution_state.
 ENDCLASS.
-
-
 
 CLASS zcl_brainfuck_interpreter IMPLEMENTATION.
 
