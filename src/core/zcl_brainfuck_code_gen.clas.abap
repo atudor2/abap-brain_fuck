@@ -7,9 +7,17 @@ CLASS zcl_brainfuck_code_gen DEFINITION
   PUBLIC SECTION.
     INTERFACES zif_brainfuck_executor.
 
+    "! Line of generated ABAP code
     TYPES t_prog_src TYPE c LENGTH 255.
+    "! Table of generated ABAP code
     TYPES tt_prog_src TYPE STANDARD TABLE OF t_prog_src WITH EMPTY KEY.
 
+    "! <p class="shorttext synchronized" lang="en">Generate ABAP program for the set of Brainfuck instructions</p>
+    "! @parameter it_instructions | <p class="shorttext synchronized" lang="en">Brainfuck instructions</p>
+    "! @parameter i_memory_cells | <p class="shorttext synchronized" lang="en">Size of memory cells buffer</p>
+    "! @parameter et_source_code | <p class="shorttext synchronized" lang="en">Table of generated ABAP code</p>
+    "! @parameter r_result | <p class="shorttext synchronized" lang="en">Instance of generated class</p>
+    "! @raising zcx_brainfuck_error | <p class="shorttext synchronized" lang="en">Code generation error</p>
     CLASS-METHODS generate_program
       IMPORTING
         it_instructions TYPE zif_brainfuck_executor=>tt_instructions
@@ -46,8 +54,6 @@ CLASS zcl_brainfuck_code_gen DEFINITION
     CLASS-METHODS get_generated_at
       RETURNING
         VALUE(r_result) TYPE t_prog_src.
-
-
 ENDCLASS.
 
 CLASS zcl_brainfuck_code_gen IMPLEMENTATION.

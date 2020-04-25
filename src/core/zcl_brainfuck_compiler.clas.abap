@@ -31,6 +31,7 @@ CLASS zcl_brainfuck_compiler DEFINITION
         VALUE(r_result) TYPE t_added_instruction
       RAISING
         zcx_brainfuck_error.
+
     METHODS can_token_fold
       IMPORTING
         i_token         TYPE zif_brainfuck_instruction=>t_instruction_type

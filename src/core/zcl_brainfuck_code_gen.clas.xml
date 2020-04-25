@@ -11,6 +11,14 @@
     <FIXPT>X</FIXPT>
     <UNICODE>X</UNICODE>
    </VSEOCLASS>
+   <DESCRIPTIONS>
+    <SEOCOMPOTX>
+     <CLSNAME>ZCL_BRAINFUCK_CODE_GEN</CLSNAME>
+     <CMPNAME>GENERATE_PROGRAM</CMPNAME>
+     <LANGU>E</LANGU>
+     <DESCRIPT>Generate ABAP program for the set of Brainfuck instructions</DESCRIPT>
+    </SEOCOMPOTX>
+   </DESCRIPTIONS>
   </asx:values>
  </asx:abap>
 </abapGit>

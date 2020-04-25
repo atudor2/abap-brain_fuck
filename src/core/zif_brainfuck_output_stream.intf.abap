@@ -10,6 +10,6 @@ INTERFACE zif_brainfuck_output_stream
   METHODS write_character
     IMPORTING i_character TYPE t_character_byte.
 
-  "! <p class="shorttext synchronized" lang="en">Flush the output buffer to the stream</p>
+  "! <p class="shorttext synchronized" lang="en">Flush the output buffer to the underlying stream</p>
   METHODS flush.
 ENDINTERFACE.

@@ -1,3 +1,4 @@
+"! <p class="shorttext synchronized" lang="en">Brainfuck Syntax Error</p>
 CLASS zcx_brainfuck_syntax_error DEFINITION
   PUBLIC
   INHERITING FROM zcx_brainfuck_error
@@ -5,6 +6,11 @@ CLASS zcx_brainfuck_syntax_error DEFINITION
 
   PUBLIC SECTION.
     "! <p class="shorttext synchronized" lang="en">CONSTRUCTOR</p>
+    "! @parameter message | <p class="shorttext synchronized" lang="en">Error message</p>
+    "! @parameter location | <p class="shorttext synchronized" lang="en">Location in Brainfuck source that contains error</p>
+    "! @parameter source_code | <p class="shorttext synchronized" lang="en">Brainfuck source ode</p>
+    "! @parameter textid | <p class="shorttext synchronized" lang="en">TEXTID</p>
+    "! @parameter previous | <p class="shorttext synchronized" lang="en">Previous Exception</p>
     METHODS constructor
       IMPORTING
         message     TYPE string
@@ -13,6 +19,8 @@ CLASS zcx_brainfuck_syntax_error DEFINITION
         textid      LIKE if_t100_message=>t100key OPTIONAL
         previous    LIKE previous OPTIONAL .
 
+    "! <p class="shorttext synchronized" lang="en">Gets the formatted error message of the syntax error</p>
+    "! @parameter r_result | <p class="shorttext synchronized" lang="en">Formatted error message</p>
     METHODS get_error_message
       RETURNING VALUE(r_result) TYPE string.
   PROTECTED SECTION.

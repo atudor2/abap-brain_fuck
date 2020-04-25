@@ -15,7 +15,7 @@
      <CLSNAME>ZIF_BRAINFUCK_OUTPUT_STREAM</CLSNAME>
      <CMPNAME>FLUSH</CMPNAME>
      <LANGU>E</LANGU>
-     <DESCRIPT>Flush the output buffer to the stream</DESCRIPT>
+     <DESCRIPT>Flush the output buffer to the underlying stream</DESCRIPT>
     </SEOCOMPOTX>
     <SEOCOMPOTX>
      <CLSNAME>ZIF_BRAINFUCK_OUTPUT_STREAM</CLSNAME>

@@ -38,6 +38,12 @@ INTERFACE zif_brainfuck_instruction
     "! Generic Instruction argument
     argument             TYPE i.
 
+  "! <p class="shorttext synchronized" lang="en">Creates a Brainfuck instructions</p>
+  "! @parameter i_instruction | <p class="shorttext synchronized" lang="en">Type of instruction</p>
+  "! @parameter i_location | <p class="shorttext synchronized" lang="en">Location of instruction in Brainfuck source code</p>
+  "! @parameter i_repeated | <p class="shorttext synchronized" lang="en">The number of times this instruction is repeated consecutively</p>
+  "! @parameter r_result | <p class="shorttext synchronized" lang="en">Brainfuck instruction</p>
+  "! @raising zcx_brainfuck_error | <p class="shorttext synchronized" lang="en">Error occurred during creation of instruction</p>
   CLASS-METHODS create
     IMPORTING
       i_instruction   TYPE t_instruction_type

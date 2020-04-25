@@ -5,11 +5,17 @@ CLASS zcl_brainfuck_executor_base DEFINITION
   CREATE PROTECTED .
 
   PUBLIC SECTION.
+    "! <p class="shorttext synchronized" lang="en">Constructor</p>
+    "! @parameter i_large_cell_values | <p class="shorttext synchronized" lang="en">ABAP_TRUE if large memory cells should be supported</p>
     METHODS constructor
       IMPORTING
         i_large_cell_values TYPE abap_bool DEFAULT abap_false.
 
   PROTECTED SECTION.
+    "! <p class="shorttext synchronized" lang="en">Adjusts a cell value with wrapping</p>
+    "! @parameter i_value | <p class="shorttext synchronized" lang="en">Current cell value</p>
+    "! @parameter i_adjustment | <p class="shorttext synchronized" lang="en">Cell adjustment</p>
+    "! @parameter r_result | <p class="shorttext synchronized" lang="en">New cell value</p>
     METHODS adj_cell_value_with_wrap
       IMPORTING
         i_value         TYPE zif_brainfuck_instruction=>t_memory_cell
@@ -17,6 +23,11 @@ CLASS zcl_brainfuck_executor_base DEFINITION
       RETURNING
         VALUE(r_result) TYPE zif_brainfuck_instruction=>t_memory_cell.
 
+    "! <p class="shorttext synchronized" lang="en">Shifts the data pointer left/right</p>
+    "! @parameter i_dp | <p class="shorttext synchronized" lang="en">Current data pointer value</p>
+    "! @parameter i_shift | <p class="shorttext synchronized" lang="en">Shift for the data pointer</p>
+    "! @parameter i_max_cells | <p class="shorttext synchronized" lang="en">Maximum number of memory cells in the buffer</p>
+    "! @parameter r_result | <p class="shorttext synchronized" lang="en">New data pointer value</p>
     METHODS move_data_pointer
       IMPORTING
         i_dp            TYPE i
@@ -25,6 +36,9 @@ CLASS zcl_brainfuck_executor_base DEFINITION
       RETURNING
         VALUE(r_result) TYPE i.
 
+    "! <p class="shorttext synchronized" lang="en">Initialise the memory cell buffer</p>
+    "! @parameter i_max_cells | <p class="shorttext synchronized" lang="en">Max number of cells for buffer</p>
+    "! @parameter ct_memory_cells | <p class="shorttext synchronized" lang="en">Table of memory cell buffer</p>
     METHODS initialise_memory_cells
       IMPORTING
         i_max_cells     TYPE i

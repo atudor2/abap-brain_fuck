@@ -1,3 +1,4 @@
+"! <p class="shorttext synchronized" lang="en">Brainfuck Code Generation Error</p>
 CLASS zcx_brainfuck_code_gen_error DEFINITION
   PUBLIC
   INHERITING FROM zcx_brainfuck_error
@@ -6,17 +7,30 @@ CLASS zcx_brainfuck_code_gen_error DEFINITION
 
   PUBLIC SECTION.
     TYPES:
+      "! Description of the ABAP syntax error
       BEGIN OF t_syntax_error,
+        "! Line of the error
         line    TYPE string,
+        "! The WORD of the invalid statement
         word    TYPE string,
+        "! Error message
         message TYPE string,
+        "! Offset in the code
         offset  TYPE i,
       END OF t_syntax_error,
+      "! Table of invalid source code
       tt_program_source TYPE STANDARD TABLE OF string WITH EMPTY KEY.
 
+    "! Generated ABAP code with errors
     DATA generated_source_code TYPE tt_program_source READ-ONLY.
+    "! Details of the syntax error
     DATA syntax_error_details TYPE t_syntax_error READ-ONLY.
 
+    "! <p class="shorttext synchronized" lang="en">CONSTRUCTOR</p>
+    "! @parameter textid | <p class="shorttext synchronized" lang="en">TEXTID</p>
+    "! @parameter previous | <p class="shorttext synchronized" lang="en">Previous exception</p>
+    "! @parameter it_program_source | <p class="shorttext synchronized" lang="en">Source code of generated code</p>
+    "! @parameter i_syntax_error | <p class="shorttext synchronized" lang="en">Syntax error details</p>
     METHODS constructor
       IMPORTING
         textid            LIKE if_t100_message=>t100key OPTIONAL

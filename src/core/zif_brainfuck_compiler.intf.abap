@@ -6,6 +6,7 @@ INTERFACE zif_brainfuck_compiler
   TYPES tt_instructions TYPE zif_brainfuck_instruction=>tt_instructions.
 
   TYPES:
+    "! Optimisation level
     BEGIN OF ENUM enum_optimisation STRUCTURE optimisation_levels,
       none,
       full,
@@ -14,6 +15,7 @@ INTERFACE zif_brainfuck_compiler
   "! <p class="shorttext synchronized" lang="en">Compile Brainfuck source code into a set of instructions</p>
   "! @parameter i_code | <p class="shorttext synchronized" lang="en">Brainfuck source code</p>
   "! @parameter i_allow_debugger | <p class="shorttext synchronized" lang="en">Allow debugger instructions (ABAP_TRUE)?</p>
+  "! @parameter i_optimisation_level | <p class="shorttext synchronized" lang="en">Optimisation level to apply during compilation</p>
   "! @parameter et_instructions | <p class="shorttext synchronized" lang="en">Table of result instructions</p>
   "! @raising zcx_brainfuck_error | <p class="shorttext synchronized" lang="en"></p>
   METHODS compile

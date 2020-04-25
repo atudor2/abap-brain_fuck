@@ -13,6 +13,7 @@ INTERFACE zif_brainfuck_executor
   "! @parameter ir_input | <p class="shorttext synchronized" lang="en">Input Stream</p>
   "! @parameter ir_output | <p class="shorttext synchronized" lang="en">Output Stream</p>
   "! @parameter i_memory_cells | <p class="shorttext synchronized" lang="en">Number of Memory Cells</p>
+  "! @parameter ir_inspector | <p class="shorttext synchronized" lang="en">Execution engine inspector callbacks</p>
   "! @raising zcx_brainfuck_error | <p class="shorttext synchronized" lang="en"></p>
   METHODS execute
     IMPORTING
